@@ -12,6 +12,7 @@ from telebot import types
 env = Env()
 env.read_env()
 bot = telebot.TeleBot(env.str("TG_TOKEN"))
+pay_token = env.str("PAY_TOKEN")
 user_state = {}
 user_data = {}
 
@@ -57,6 +58,24 @@ def start_pay(message):
     user_state[user_id] = "email"
     user_data[user_id] = {}
     bot.send_message(user_id, text="Enter your e-mail!")
+
+
+def pay(message):
+    user = CustomUser.objects.get(tg_id=message.chat.id)
+    order = Order.objects.get(user=user,is_draft=True)
+    total_price = 0
+    for order_element in OrderElement.objects.filter(order=order):
+        total_price += order_element.price
+    prices=[types.LabeledPrice(label="Pay for Order",amount=total_price*100)]
+    bot.send_invoice(message.chat.id,title="Paying",description="Pay for Order",provider_token=pay_token,currency="try",prices=prices,start_parameter="test_pay",invoice_payload="test_payload")
+@bot.pre_checkout_query_handler(func=lambda q:True)
+def pre_checkout(pre_checkout_query):
+    bot.answer_pre_checkout_query(pre_checkout_query_id=pre_checkout_query.id,ok=True)
+@bot.message_handler(content_types=["successful_payment"])
+def got_payment(message):
+    confirm_order(message.chat.id)
+    create_cart(message.chat.id)
+    bot.send_message(message.chat.id,text="Pay completed!")
 
 
 @bot.message_handler(func=lambda msg: msg.chat.id in user_state)
@@ -203,9 +222,8 @@ def callback_handler(call):
             markup.row(menu_btn)
             bot.send_message(call.message.chat.id, text="Add somthing first", reply_markup=markup)
     if call.data == "confirm":
-        confirm_order(call.message.chat.id)
-        bot.send_message(call.message.chat.id, text="Order payed")
-        create_cart(call.message.chat.id)
+        pay(call.message)
+
     if call.data == "cancel":
         markup = types.InlineKeyboardMarkup()
         cart_btn = types.InlineKeyboardButton(text="Back", callback_data="cart")
