@@ -1,5 +1,7 @@
 from django.contrib import admin
-from cake.models import CustomUser, Order, OrderElement, Cake, CakeCategory, Ingredient, Size
+
+from cake.models import (Cake, CakeCategory, CustomUser, Ingredient, Order,
+                         OrderElement, Size)
 
 
 class OrderElementsInlines(admin.TabularInline):

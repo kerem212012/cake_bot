@@ -71,6 +71,3 @@ cake_bot/
 
 Access the Django admin interface at `http://localhost:8000/admin` to manage cakes, orders, and other data.
 
-## License
-
-MIT

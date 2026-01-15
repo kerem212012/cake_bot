@@ -6,8 +6,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cake_bot.settings')
 django.setup()
 import telebot
 from environs import Env
-from cake.models import *
 from telebot import types
+
+from cake.models import *
 
 env = Env()
 env.read_env()
