@@ -29,7 +29,6 @@ cake_bot/
 │   ├── asgi.py             # ASGI configuration
 │   ├── wsgi.py             # WSGI configuration
 ├── manage.py               # Django management script
-├── db.sqlite3              # SQLite database
 └── media/                  # Media files storage
 ```
 
